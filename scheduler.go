@@ -38,10 +38,40 @@ func (s Scheduler) AddListener(event string, listenFunc ListenFunc) {
 	s.listeners[event] = listenFunc
 }
 
+// CallListeners calls the event listener of provided event
+func (s Scheduler) CallListeners(event Event) {
+	eventFn, ok := s.listeners[event.Name]
+	if ok {
+		go eventFn(event.Payload)
+		s.ClearEvent(event)
+	} else {
+		log.Print("💀 error: couldn't find event listeners attached to ", event.Name)
+	}
+
+}
+
+// ClearEvent clears job from database
+func (s Scheduler) ClearEvent(event Event) {
+	_, err := s.db.Exec(`DELETE FROM "public"."jobs" WHERE "id" = $1`, event.ID)
+	if err != nil {
+		log.Print("💀 error: ", err)
+	}
+}
+
 // CheckDueEvents checks and returns due events
-func (s Scheduler) CheckDueEvents() {
-	// var event Event
-	// s.db.Query(`SELECT id, name, payload FROM jobs WHERE locked = 0`)
+func (s Scheduler) CheckDueEvents() []Event {
+	events := []Event{}
+	rows, err := s.db.Query(`SELECT id, name, payload FROM jobs WHERE runAt < $1`, time.Now())
+	if err != nil {
+		log.Print("💀 error: ", err)
+		return nil
+	}
+	for rows.Next() {
+		evt := Event{}
+		rows.Scan(&evt.ID, &evt.Name, &evt.Payload)
+		events = append(events, evt)
+	}
+	return events
 }
 
 // Schedule sechedules the provided events
