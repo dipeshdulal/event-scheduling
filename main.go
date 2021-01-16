@@ -25,6 +25,8 @@ func main() {
 
 	db := initDBConnection()
 
+	seedDB(db)
+
 	rows, err := db.Query("SELECT id, name FROM public.test")
 
 	if err != nil {
@@ -43,7 +45,7 @@ func main() {
 
 	go func() {
 		for range interrupt {
-			log.Print("Interrupt received closing...")
+			log.Println("\n❌ Interrupt received closing...")
 			cancel()
 		}
 	}()
