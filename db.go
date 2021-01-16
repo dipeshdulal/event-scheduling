@@ -22,9 +22,11 @@ func initDBConnection() *sql.DB {
 func seedDB(db *sql.DB) error {
 	log.Print("💾 Seeding database with table...")
 	_, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS "public"."test" (
-			"id" integer NOT NULL,
-			"name" text NOT NULL
+		CREATE TABLE IF NOT EXISTS "public"."jobs" (
+			"id"      SERIAL PRIMARY KEY,
+			"name"    varchar(50) NOT NULL,
+			"payload" text,
+			"runAt"   TIMESTAMP NOT NULL
 		)
 	`)
 	return err
