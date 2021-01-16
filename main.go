@@ -31,9 +31,11 @@ func main() {
 	seedDB(db)
 
 	scheduler := NewScheduler(db, eventListeners)
-	scheduler.CheckDueEvents()
+
+	scheduler.CheckEventsInInterval(ctx, time.Minute)
 
 	scheduler.Schedule("SendEmail", "mail: nilkantha.dipesh@gmail.com", time.Now().Add(1*time.Minute))
+	scheduler.Schedule("PayBills", "paybills: $4,000 bill", time.Now().Add(5*time.Minute))
 
 	go func() {
 		for range interrupt {
