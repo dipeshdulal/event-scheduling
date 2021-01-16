@@ -93,6 +93,7 @@ func (s Scheduler) checkDueEvents() []Event {
 
 // Schedule sechedules the provided events
 func (s Scheduler) Schedule(event string, payload string, runAt time.Time) {
+	log.Print("🚀 Scheduling event ", event, " to run at ", runAt)
 	_, err := s.db.Exec(`INSERT INTO "public"."jobs" ("name", "payload", "runAt") VALUES ($1, $2, $3)`, event, payload, runAt)
 	if err != nil {
 		log.Print("schedule insert error: ", err)
