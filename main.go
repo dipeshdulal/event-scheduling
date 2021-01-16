@@ -5,21 +5,14 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/joho/godotenv"
 
 	"github.com/dipeshdulal/event-scheduling/customevents"
 )
 
-// Event structure
-type Event struct {
-	ID      uint
-	Name    string
-	Payload string
-	Locked  string
-}
-
-var eventListeners = map[string]func(d interface{}){
+var eventListeners = Listeners{
 	"SendEmail": customevents.SendEmail,
 	"PayBills":  customevents.PayBills,
 }
@@ -36,6 +29,11 @@ func main() {
 
 	db := initDBConnection()
 	seedDB(db)
+
+	scheduler := NewScheduler(db, eventListeners)
+	scheduler.CheckDueEvents()
+
+	scheduler.Schedule("SendEmail", "mail: nilkantha.dipesh@gmail.com", time.Now().Add(1*time.Minute))
 
 	go func() {
 		for range interrupt {
