@@ -26,8 +26,14 @@ func seedDB(db *sql.DB) error {
 			"id"      SERIAL PRIMARY KEY,
 			"name"    varchar(50) NOT NULL,
 			"payload" text,
-			"runAt"   TIMESTAMP NOT NULL
+			"runAt"   TIMESTAMP NOT NULL,
+			"cron"    varchar(50) DEFAULT '-'
 		)
 	`)
+
+	if err != nil {
+		log.Panic("query error: ", err)
+	}
+
 	return err
 }

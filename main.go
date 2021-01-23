@@ -32,10 +32,15 @@ func main() {
 
 	scheduler := NewScheduler(db, eventListeners)
 
+	stopCron := scheduler.StartCron()
+	defer stopCron()
+
 	scheduler.CheckEventsInInterval(ctx, time.Minute)
 
 	scheduler.Schedule("SendEmail", "mail: nilkantha.dipesh@gmail.com", time.Now().Add(1*time.Minute))
 	scheduler.Schedule("PayBills", "paybills: $4,000 bill", time.Now().Add(2*time.Minute))
+
+	scheduler.ScheduleCron("SendEmail", "mail: dipesh.dulal+new@wesionary.team", "* * * * *")
 
 	go func() {
 		for range interrupt {
